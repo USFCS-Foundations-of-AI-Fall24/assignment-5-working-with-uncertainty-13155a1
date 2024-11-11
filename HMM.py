@@ -9,6 +9,8 @@ import numpy
 # Sequence - represents a sequence of hidden states and corresponding
 # output variables.
 
+# hidden states들을 찾아내라.
+
 class Sequence:
     def __init__(self, stateseq, outputseq):
         self.stateseq  = stateseq   # sequence of states
@@ -34,6 +36,7 @@ class HMM:
         self.emissions = emissions
 
     ## part 1 - you do this.
+    # lander.emit, lander.trans에서 init에 나와 있는 것과 같은 데이터를 불러오는 함수
     def load(self, basename):
         """reads HMM structure from transition (basename.trans),
         and emission (basename.emit) files,
@@ -41,14 +44,15 @@ class HMM:
         pass
 
 
-   ## you do this.
+    ## you do this.
+    # 5-6 line code 정도일 것임.
     def generate(self, n):
         """return an n-length Sequence by randomly sampling from this HMM."""
         pass
 
     def forward(self, sequence):
         pass
-    ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
+    ## you do this: Implement the Viterbi(forward?) algorithm. Given a Sequence with a list of emissions,
     ## determine the most likely sequence of states.
 
 
@@ -61,6 +65,8 @@ class HMM:
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
     ## hidden states using the Viterbi algorithm.
 
+    # 달라지는 two big things
+    # max instead of sum
 
 
 

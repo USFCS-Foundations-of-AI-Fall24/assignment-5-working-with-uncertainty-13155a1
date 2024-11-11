@@ -11,6 +11,8 @@ import joblib
 ### This code shows how to use KFold to do cross_validation.
 ### This is just one of many ways to manage training and test sets in sklearn.
 
+## California dataset은 선택하지 마라!
+
 iris = load_iris()
 X, y = iris.data, iris.target
 scores = []
@@ -18,14 +20,16 @@ kf = KFold(n_splits=5)
 for train_index, test_index in kf.split(X) :
     X_train, X_test, y_train, y_test = \
         (X[train_index], X[test_index], y[train_index], y[test_index])
-    clf = tree.DecisionTreeClassifier()
-    clf.fit(X_train, y_train)
-    scores.append(clf.score(X_test, y_test))
+    clf = tree.DecisionTreeClassifier() # create empty tree
+    # clf = RandomForestClassifier(criterion='entropy', n_estimators=10) # random forest classfier (creterion(genie?)과 n_estimator(25)을 바꿔서 테스팅할 수 있음)
+    clf.fit(X_train, y_train) # training
+    scores.append(clf.score(X_test, y_test)) # predict, accuracy 등
 
 print(scores)
 
 ## Part 2. This code (from https://scikit-learn.org/1.5/auto_examples/ensemble/plot_forest_hist_grad_boosting_comparison.html)
 ## shows how to use GridSearchCV to do a hyperparameter search to compare two techniques.
+
 from sklearn.datasets import load_breast_cancer
 
 X,y = load_breast_cancer(return_X_y=True, as_frame=True)
@@ -42,10 +46,10 @@ models = {
     ),
 }
 param_grids = {
-    "Random Forest": {"n_estimators": [10, 20, 50, 100]},
-    "Hist Gradient Boosting": {"max_iter": [10, 20, 50, 100, 300, 500]},
+    "Random Forest": {"n_estimators": [10, 20, 50, 100]}, # how may tree recreate
+    "Hist Gradient Boosting": {"max_iter": [10, 20, 50, 100, 300, 500]}, # maximum number
 }
-cv = KFold(n_splits=2, shuffle=True, random_state=0)
+cv = KFold(n_splits=5, shuffle=True, random_state=0) # 2-fold에서 5-fold로 수정함
 
 results = []
 for name, model in models.items():
@@ -54,13 +58,16 @@ for name, model in models.items():
         param_grid=param_grids[name],
         return_train_score=True,
         cv=cv,
-    ).fit(X, y)
+    ).fit(X, y) # 시간이 오래 걸릴 것! (특히 five-fold 할 때)
     result = {"model": name, "cv_results": pd.DataFrame(grid_search.cv_results_)}
     results.append(result)
 
 print(results)
 
 #### Part 3: This shows how to generate a scatter plot of your results
+
+# 코드를 수정할 필요 X (해보고 싶으면 햐보가 되긴 함)
+# 잘 실행되는지만 포함시켜라.
 
 import plotly.colors as colors
 import plotly.express as px

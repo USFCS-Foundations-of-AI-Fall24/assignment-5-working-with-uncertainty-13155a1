@@ -7,7 +7,8 @@ car_model = BayesianNetwork(
         ("Battery", "Ignition"),
         ("Ignition","Starts"),
         ("Gas","Starts"),
-        ("Starts","Moves")
+        ("Starts","Moves"),
+        ("KeyPresent")
     ]
 )
 
@@ -17,7 +18,7 @@ from pgmpy.factors.discrete import TabularCPD
 cpd_battery = TabularCPD(
     variable="Battery", variable_card=2, values=[[0.70], [0.30]],
     state_names={"Battery":['Works',"Doesn't work"]},
-)
+) 
 
 cpd_gas = TabularCPD(
     variable="Gas", variable_card=2, values=[[0.40], [0.60]],
@@ -31,7 +32,7 @@ cpd_radio = TabularCPD(
     evidence_card=[2],
     state_names={"Radio": ["turns on", "Doesn't turn on"],
                  "Battery": ['Works',"Doesn't work"]}
-)
+) # 얘를 복붙해서 KeyPresent로 바꿔라.
 
 cpd_ignition = TabularCPD(
     variable=  "Ignition", variable_card=2,
