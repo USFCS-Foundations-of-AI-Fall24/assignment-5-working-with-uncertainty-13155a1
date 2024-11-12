@@ -8,7 +8,7 @@ car_model = BayesianNetwork(
         ("Ignition","Starts"),
         ("Gas","Starts"),
         ("Starts","Moves"),
-        ("KeyPresent")
+        # ("KeyPresent")
     ]
 )
 
@@ -67,6 +67,31 @@ car_model.add_cpds( cpd_starts, cpd_ignition, cpd_gas, cpd_radio, cpd_battery, c
 
 car_infer = VariableElimination(car_model)
 
-print(car_infer.query(variables=["Moves"],evidence={"Radio":"turns on", "Starts":"yes"}))
+# print(car_infer.query(variables=["Moves"],evidence={"Radio":"turns on", "Starts":"yes"}))
 
+if __name__ == '__main__':
+    print("Given that the car will not move, what is the probability that the battery is not working?")
+    print(car_infer.query(variables=["Battery"], evidence={"Moves":"no"}))
+    print()
 
+    print("Given that the radio is not working, what is the probability that the car will not start?")
+    print(car_infer.query(variables=["Starts"], evidence={"Radio":"Doesn't turn on"}))
+    print()
+
+    print("Given that the battery is working, does the probability of the radio working change if we discover that the car has gas in it?")
+    print("(not discovered about gas)")
+    print(car_infer.query(variables=["Radio"], evidence={"Battery":"Works"}))
+    print("(discovered that gas is full)")
+    print(car_infer.query(variables=["Radio"], evidence={"Battery":"Works", "Gas":"Full"}))
+    print()
+
+    print("Given that the car doesn't move, how does the probability of the ignition failing change if we observe that the car dies not have gas in it?")
+    print("(not observed about gas)")
+    print(car_infer.query(variables=["Ignition"], evidence={"Moves":"no"}))
+    print("(observed that gas is empty)")
+    print(car_infer.query(variables=["Ignition"], evidence={"Moves":"no", "Gas":"Empty"}))
+    print()
+
+    print("What is the probability that the car starts if the radio works and it has gas in it?")
+    print(car_infer.query(variables=["Starts"], evidence={"Radio":"turns on", "Gas":"Full"}))
+    print()
