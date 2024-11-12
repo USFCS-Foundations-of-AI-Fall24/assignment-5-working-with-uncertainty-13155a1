@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassif
 import pandas as pd
 from sklearn.model_selection import GridSearchCV, KFold
 import joblib
+import numpy as np
 
 ############################ question 1-1 ############################
 
@@ -25,3 +26,25 @@ for train_index, test_index in kf.split(X) :
 print ("[ question #1-1 ]")
 print(scores)
 print()
+
+############################ question 2-1 ############################
+nlist = [10, 25, 50]
+clist = ['entropy', 'gini']
+
+print("[ question #1-2 ]")
+for c in clist:
+    for n in nlist:
+        wine = load_wine()
+        X, y = wine.data, wine.target
+        scores = []
+        kf = KFold(n_splits=5)
+        for train_index, test_index in kf.split(X) :
+            X_train, X_test, y_train, y_test = \
+                (X[train_index], X[test_index], y[train_index], y[test_index])
+            clf = RandomForestClassifier(criterion=c, n_estimators=n)
+            clf.fit(X_train, y_train)
+            scores.append(clf.score(X_test, y_test))
+
+        print ("n_estimator = ", n, ", criterion = ", c)
+        print("- scores: ", scores)
+        print("- average: ", np.mean(scores))
