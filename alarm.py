@@ -61,6 +61,12 @@ alarm_infer = VariableElimination(alarm_model)
 # problem #2 - part1
 
 # the probability of Mary Calling given that John called
-q = alarm_infer.query(variables=["MaryCalls"],evidence={"JohnCalls":"yes"})
-print(q)
+q1 = alarm_infer.query(variables=["MaryCalls"], evidence={"JohnCalls":"yes"})
+q2 = alarm_infer.query(variables=["MaryCalls", "JohnCalls"], evidence={"Alarm":"yes"})
+q3 = alarm_infer.query(variables=["Alarm"], evidence={"MaryCalls":"yes"})
 
+
+if __name__ == '__main__':
+    print("the probability of Mary Calling given that John called: \n", q1)
+    print("The probability of both John and Mary calling given Alarm: \n", q2)
+    print("the probability of Alarm, given that Mary called: \n", q3)
