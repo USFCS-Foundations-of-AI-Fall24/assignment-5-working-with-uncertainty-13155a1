@@ -59,7 +59,6 @@ class HMM:
                         self.emissions[state] = {}
                     self.emissions[state][output] = prob
 
-
     ## you do this.
     # 5-6 line code 정도일 것임.
     def generate(self, n):
@@ -90,22 +89,18 @@ class HMM:
         states = list(self.transitions.keys())
         states.remove("#")
 
-        N = len(states)  # 상태의 개수
-        T = len(sequence)  # 관측 시퀀스의 길이
+        N = len(states) 
+        T = len(sequence) 
 
-        # alpha 배열 초기화: T x N 크기의 행렬
         alpha = np.zeros((T, N))
 
-        # 초기 단계: 첫 번째 관측값에 대한 alpha 초기화
         first_obs = sequence[0]
         
-        # 시작 확률을 동일하게 초기화 (1 / N)
         start_prob = 1 / N
         for s in range(N):
             state = states[s]
             alpha[0, s] = start_prob * self.emissions[state].get(first_obs, 0)
 
-        # 재귀 단계: 이후 관측값에 대한 alpha 계산
         for t in range(1, T):
             obs = sequence[t]
             for s in range(N):
@@ -116,7 +111,6 @@ class HMM:
                 ]
                 alpha[t, s] = max(trans_probs) * self.emissions[state].get(obs, 0)
 
-        # 최종 상태 계산: 마지막 단계에서 가장 높은 확률을 가진 상태 선택
         best_last_state_index = np.argmax(alpha[T - 1, :])
         best_last_state = states[best_last_state_index]
 
@@ -127,12 +121,6 @@ class HMM:
         
         return best_last_state
 
-
-
-
-
-
-
     def viterbi(self, sequence):
         pass
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
@@ -140,12 +128,51 @@ class HMM:
 
     # 달라지는 two big things
     # max instead of sum
+        EPSILON = 1e-10 
+
+        states = list(self.transitions.keys())
+        states.remove("#") 
+
+        N = len(states)
+        T = len(sequence) 
+
+        viterbi_matrix = np.zeros((T, N))
+        backpointer_matrix = np.zeros((T, N), dtype=int) 
+
+        first_obs = sequence[0]
+        for s in range(N):
+            state = states[s]
+            viterbi_matrix[0, s] = (1 / N) * self.emissions[state].get(first_obs, EPSILON)
+            backpointer_matrix[0, s] = 0 
+
+        for t in range(1, T):
+            obs = sequence[t]
+            for s in range(N):
+                state = states[s]
+                trans_probs = [
+                    viterbi_matrix[t - 1, prev_s] * self.transitions[states[prev_s]].get(state, EPSILON)
+                    for prev_s in range(N)
+                ]
+                max_prob = max(trans_probs)
+                viterbi_matrix[t, s] = max_prob * self.emissions[state].get(obs, EPSILON)
+                backpointer_matrix[t, s] = np.argmax(trans_probs)
+
+        best_last_state_index = np.argmax(viterbi_matrix[T - 1, :])
+        best_last_state = states[best_last_state_index]
+
+        best_path = [best_last_state]
+        for t in range(T - 1, 0, -1):
+            best_last_state_index = backpointer_matrix[t, best_last_state_index]
+            best_path.insert(0, states[best_last_state_index])
+
+        return best_path
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="HMM Simulation")
     parser.add_argument("basename", type=str, help="basename")
     parser.add_argument("--generate", type=int, help="method - generate")
     parser.add_argument("--forward", type=str, help="method - forward")
+    parser.add_argument("--viterbi", type=str, help="method - viterbi")
     args = parser.parse_args()
 
     hmm = HMM()
@@ -172,3 +199,8 @@ if __name__ == "__main__":
             best_states = hmm.forward(sequence, args.basename)
             print("Most likely hidden states: ", best_states)
 
+    if args.viterbi:
+        with open(args.viterbi, 'r') as file:
+            sequence = file.read().strip().split()
+        best_states = hmm.viterbi(sequence)
+        print("Most likely hidden states: ", best_states)
