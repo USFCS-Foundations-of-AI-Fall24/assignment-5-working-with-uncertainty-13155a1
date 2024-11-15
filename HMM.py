@@ -41,7 +41,26 @@ class HMM:
         """reads HMM structure from transition (basename.trans),
         and emission (basename.emit) files,
         as well as the probabilities."""
-        pass
+        trans_file = f"{basename}.trans"
+        if os.path.exists(trans_file):
+            with open(trans_file, "r") as file:
+                for line in file:
+                    state1, state2, prob = line.split()
+                    prob = float(prob)
+                    if state1 not in self.transitions:
+                        self.transitions[state1] = {}
+                    self.transitions[state1][state2] = prob
+
+        # Load emissions
+        emit_file = f"{basename}.emit"
+        if os.path.exists(emit_file):
+            with open(emit_file, "r") as file:
+                for line in file:
+                    state, output, prob = line.split()
+                    prob = float(prob)
+                    if state not in self.emissions:
+                        self.emissions[state] = {}
+                    self.emissions[state][output] = prob
 
 
     ## you do this.
