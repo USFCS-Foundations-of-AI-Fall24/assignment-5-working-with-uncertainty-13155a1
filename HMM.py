@@ -29,9 +29,6 @@ class HMM:
         e.g. {'happy': {'silent': '0.2', 'meow': '0.3', 'purr': '0.5'},
               'grumpy': {'silent': '0.5', 'meow': '0.4', 'purr': '0.1'},
               'hungry': {'silent': '0.2', 'meow': '0.6', 'purr': '0.2'}}"""
-
-
-
         self.transitions = transitions
         self.emissions = emissions
 
@@ -67,7 +64,27 @@ class HMM:
     # 5-6 line code 정도일 것임.
     def generate(self, n):
         """return an n-length Sequence by randomly sampling from this HMM."""
-        pass
+        states = ['#']
+        emissions = []
+        
+        for _ in range(n):
+            # add next state
+            cur_state = states[-1]
+            next_state = random.choices(
+                population=list(self.transitions[cur_state].keys()),
+                weights=list(map(float, self.transitions[cur_state].values()))
+            )[0]
+            states.append(next_state)
+            # print("next_state: ", next_state)
+
+            # add next emission
+            emission = random.choices(
+                population=list(self.emissions[next_state].keys()),
+                weights=list(map(float, self.emissions[next_state].values()))
+            )[0]
+            emissions.append(emission)
+
+        return Sequence(states[1:], emissions)
 
     def forward(self, sequence):
         pass
@@ -87,7 +104,19 @@ class HMM:
     # 달라지는 two big things
     # max instead of sum
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="HMM Simulation")
+    parser.add_argument("basename", type=str, help="basename")
+    parser.add_argument("--generate", type=int, help="method - generate")
+    args = parser.parse_args()
 
+    hmm = HMM()
+    hmm.load(args.basename)
+    # print("transitions: ", hmm.transitions)
+    # print("emissions: ", hmm.emissions)
 
-
+    if args.generate:
+        sequence = hmm.generate(args.generate)
+        print(" ".join(sequence.stateseq)) 
+        print(" ".join(sequence.outputseq))
 
